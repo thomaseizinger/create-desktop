@@ -11,6 +11,8 @@ The code is pretty shit at the moment:
 
 Currently, it is only possible to install from source.
 
+Requires minimum version rust 1.26 (which is currently (April 2018) nightly).
+
 - Clone the repository.
 - Run `cargo install` inside the folder.
 
