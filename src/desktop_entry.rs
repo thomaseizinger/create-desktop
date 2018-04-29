@@ -75,4 +75,17 @@ Type=Application
         assert_eq!(file_contents, expected_file_contents);
     }
 
+    #[test]
+    fn should_create_path_to_desktop_file() {
+
+        let path = PathBuf::from("/foo/bar/baz.sh");
+
+        let desktop_entry = ApplicationDesktopEntry::create_for(&path);
+
+        let home = PathBuf::from("/home/thomas");
+
+        let path = desktop_entry.get_path(home);
+
+        assert_eq!(path, PathBuf::from("/home/thomas/.local/share/applications/baz.sh.desktop"));
+    }
 }
