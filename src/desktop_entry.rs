@@ -3,27 +3,19 @@ use trimmer::Context;
 use trimmer::Parser;
 
 pub struct ApplicationDesktopEntry<'a> {
-    executable: &'a PathBuf
+    executable: &'a PathBuf,
 }
 
 impl<'a> ApplicationDesktopEntry<'a> {
-
     pub fn create_for(executable: &'a PathBuf) -> Self {
-        ApplicationDesktopEntry {
-            executable
-        }
+        ApplicationDesktopEntry { executable }
     }
 
     fn get_program_name(&self) -> &str {
-        self.executable
-            .file_name()
-            .unwrap()
-            .to_str()
-            .unwrap()
+        self.executable.file_name().unwrap().to_str().unwrap()
     }
 
     pub fn create_file_contents(&self) -> String {
-
         let exec = self.executable.to_str().unwrap().to_string();
         let program_name = self.get_program_name().to_owned();
 
@@ -77,7 +69,6 @@ Type=Application
 
     #[test]
     fn should_create_path_to_desktop_file() {
-
         let path = PathBuf::from("/foo/bar/baz.sh");
 
         let desktop_entry = ApplicationDesktopEntry::create_for(&path);
@@ -86,6 +77,9 @@ Type=Application
 
         let path = desktop_entry.get_path(home);
 
-        assert_eq!(path, PathBuf::from("/home/thomas/.local/share/applications/baz.sh.desktop"));
+        assert_eq!(
+            path,
+            PathBuf::from("/home/thomas/.local/share/applications/baz.sh.desktop")
+        );
     }
 }
