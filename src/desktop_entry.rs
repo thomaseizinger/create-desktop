@@ -4,15 +4,17 @@ use trimmer::Parser;
 
 pub struct ApplicationDesktopEntry<'a> {
     executable: &'a PathBuf,
+    name: Option<&'a str>
 }
 
 impl<'a> ApplicationDesktopEntry<'a> {
-    pub fn create_for(executable: &'a PathBuf) -> Self {
-        ApplicationDesktopEntry { executable }
+    pub fn create_for(executable: &'a PathBuf, name: Option<&'a str>) -> Self {
+        ApplicationDesktopEntry { executable, name }
     }
 
     fn get_program_name(&self) -> &str {
-        self.executable.file_name().unwrap().to_str().unwrap()
+        let file_name = self.executable.file_name().unwrap().to_str();
+        self.name.or(file_name).unwrap()
     }
 
     pub fn create_file_contents(&self) -> String {
@@ -55,7 +57,7 @@ mod tests {
     fn should_create_correct_file_contents() {
         let path = PathBuf::from("/foo/bar/baz.sh");
 
-        let desktop_entry = ApplicationDesktopEntry::create_for(&path);
+        let desktop_entry = ApplicationDesktopEntry::create_for(&path, None);
 
         let file_contents = desktop_entry.create_file_contents();
         let expected_file_contents = r#"[Desktop Entry]
@@ -71,7 +73,7 @@ Type=Application
     fn should_create_path_to_desktop_file() {
         let path = PathBuf::from("/foo/bar/baz.sh");
 
-        let desktop_entry = ApplicationDesktopEntry::create_for(&path);
+        let desktop_entry = ApplicationDesktopEntry::create_for(&path, None);
 
         let home = PathBuf::from("/home/thomas");
 
@@ -80,6 +82,34 @@ Type=Application
         assert_eq!(
             path,
             PathBuf::from("/home/thomas/.local/share/applications/baz.sh.desktop")
+        );
+    }
+
+    #[test]
+    fn should_derive_program_name_from_executable() {
+        let path = PathBuf::from("/foo/bar/baz.sh");
+
+        let desktop_entry = ApplicationDesktopEntry::create_for(&path, None);
+
+        let program_name = desktop_entry.get_program_name();
+
+        assert_eq!(
+            program_name,
+            "baz.sh"
+        );
+    }
+
+    #[test]
+    fn should_override_name_if_present() {
+        let path = PathBuf::from("/foo/bar/baz.sh");
+
+        let desktop_entry = ApplicationDesktopEntry::create_for(&path, Some("baz"));
+
+        let program_name = desktop_entry.get_program_name();
+
+        assert_eq!(
+            program_name,
+            "baz"
         );
     }
 }
