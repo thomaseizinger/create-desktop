@@ -28,8 +28,7 @@ impl<'a> ApplicationDesktopEntry<'a> {
         let template = r#"[Desktop Entry]
 Name={{name}}
 Exec={{exec}}
-Type=Application
-"#;
+Type=Application"#;
 
         Parser::new()
             .parse(template)
